@@ -45,6 +45,17 @@ export interface ExploreResponse {
     data: Post[];
 }
 
+export interface SiteInformation {
+    last_post: {
+        title: string;
+        url: string;
+        created_at: string;
+    },
+    ping: number;
+    total_views: number;
+    total_posts: number;
+    total_authors: number;
+}
 export interface SiteInformationResponse {
     success: boolean;
     data: {
