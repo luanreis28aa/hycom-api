@@ -1,14 +1,15 @@
 import {
-    AuthorPostsResponse,
-    ExploreResponse,
-    ExploreSortParametr,
-    LastPostsResponse,
-    QrCodeResponse,
-    SearchPostsResponse,
-    SiteInformationResponse,
-    SortParametr,
-    TagsResponse,
-    TopAuthorResponse
+  AuthorPostsResponse,
+  ExploreResponse,
+  ExploreSortParametr,
+  LastPostsResponse,
+  QrCodeResponse,
+  SearchPostsResponse,
+  SiteInformation,
+  SiteInformationResponse,
+  SortParametr,
+  TagsResponse,
+  TopAuthorResponse
 } from "./types";
 
 /*
@@ -163,15 +164,15 @@ import {
 }
  */
 const hycom = {
-    url: "https://hycom.ir",
-    topAuthor: "/api/top-authors",
-    authorPosts: "/api/author-posts",
-    tags: "/api/tags",
-    explore: "/api/explore",
-    siteInformation: "/api/site-info",
-    lastPosts: "/api/last-posts",
-    searchPosts: "/api/search-posts",
-    qrCode: "/api/qr-code"
+  url: "https://hycom.ir",
+  topAuthor: "/api/top-authors",
+  authorPosts: "/api/author-posts",
+  tags: "/api/tags",
+  explore: "/api/explore",
+  siteInformation: "/api/site-info",
+  lastPosts: "/api/last-posts",
+  searchPosts: "/api/search-posts",
+  qrCode: "/api/qr-code"
 };
 
 /**
@@ -180,14 +181,14 @@ const hycom = {
  * @param limit Number of authors to return. (1-50)
  */
 async function topAuthor(limit: number = 10) {
-    try {
-        const response = await fetch(hycom.url + hycom.topAuthor + `?limit=${limit}`);
-        const data: TopAuthorResponse = await response.json();
+  try {
+    const response = await fetch(hycom.url + hycom.topAuthor + `?limit=${limit}`);
+    const data: TopAuthorResponse = await response.json();
 
-        return data.data;
-    } catch {
-        return null;
-    }
+    return data.data;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -198,14 +199,14 @@ async function topAuthor(limit: number = 10) {
  * @param sort Sort order. (newest, most_viewed)
  */
 async function authorPosts(display_name: string, limit: number = 10, sort: SortParametr = "newest") {
-    try {
-        const response = await fetch(hycom.url + hycom.authorPosts + `/${display_name}?limit=${limit}&sort=${sort}`);
-        const data: AuthorPostsResponse = await response.json();
+  try {
+    const response = await fetch(hycom.url + hycom.authorPosts + `/${display_name}?limit=${limit}&sort=${sort}`);
+    const data: AuthorPostsResponse = await response.json();
 
-        return data.data;
-    } catch {
-        return null;
-    }
+    return data.data;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -214,14 +215,14 @@ async function authorPosts(display_name: string, limit: number = 10, sort: SortP
  * @param limit Number of tags to return. (1-100)
  */
 async function getTags(limit: number = 20) {
-    try {
-        const response = await fetch(hycom.url + hycom.tags + `?limit=${limit}`);
-        const data: TagsResponse = await response.json();
+  try {
+    const response = await fetch(hycom.url + hycom.tags + `?limit=${limit}`);
+    const data: TagsResponse = await response.json();
 
-        return data.data;
-    } catch {
-        return null;
-    }
+    return data.data;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -234,28 +235,31 @@ async function getTags(limit: number = 20) {
  * @param tag Filter by tag slug.
  */
 async function explore(search: string = "", page: number = 1, limit: number = 12, sort: ExploreSortParametr = "newest", tag: string = "") {
-    try {
-        const response = await fetch(hycom.url + hycom.explore + `?search=${search}&page=${page}&limit=${limit}&sort=${sort}&tag=${tag}`);
-        const data: ExploreResponse = await response.json();
+  try {
+    const response = await fetch(hycom.url + hycom.explore + `?search=${search}&page=${page}&limit=${limit}&sort=${sort}&tag=${tag}`);
+    const data: ExploreResponse = await response.json();
 
-        return data.data;
-    } catch {
-        return null;
-    }
+    return data.data;
+  } catch {
+    return null;
+  }
 }
 
 /**
  * Returns site statistics including last post, total views, total posts, and total authors.
  */
 async function siteInformation() {
-    try {
-        const response = await fetch(hycom.url + hycom.siteInformation);
-        const data: SiteInformationResponse = await response.json();
+  try {
+    const now = Date.now();
+    const response = await fetch(hycom.url + hycom.siteInformation);
+    const data: SiteInformationResponse = await response.json();
+    const siteInfo = data.data as any as SiteInformation;
 
-        return data.data;
-    } catch {
-        return null;
-    }
+    siteInfo.ping = Date.now() - now;
+    return siteInfo;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -264,14 +268,14 @@ async function siteInformation() {
  * @param limit Number of posts to return. (1-50)
  */
 async function lastPosts(limit: number = 10) {
-    try {
-        const response = await fetch(hycom.url + hycom.lastPosts + `?limit=${limit}`);
-        const data: LastPostsResponse = await response.json();
+  try {
+    const response = await fetch(hycom.url + hycom.lastPosts + `?limit=${limit}`);
+    const data: LastPostsResponse = await response.json();
 
-        return data.data;
-    } catch {
-        return null;
-    }
+    return data.data;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -282,14 +286,14 @@ async function lastPosts(limit: number = 10) {
  * @param page Page number for pagination.
  */
 async function searchPosts(query: string, limit: number = 10, page: number = 1) {
-    try {
-        const response = await fetch(hycom.url + hycom.searchPosts + `?q=${query}&limit=${limit}&page=${page}`);
-        const data: SearchPostsResponse = await response.json();
+  try {
+    const response = await fetch(hycom.url + hycom.searchPosts + `?q=${query}&limit=${limit}&page=${page}`);
+    const data: SearchPostsResponse = await response.json();
 
-        return data.data;
-    } catch {
-        return null;
-    }
+    return data.data;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -298,29 +302,29 @@ async function searchPosts(query: string, limit: number = 10, page: number = 1) 
  * @param url URL to encode in QR code.
  */
 async function qrCode(url: string) {
-    try {
-        const response = await fetch(hycom.url + hycom.qrCode + `?url=${url}`);
-        const data: QrCodeResponse = await response.json();
+  try {
+    const response = await fetch(hycom.url + hycom.qrCode + `?url=${url}`);
+    const data: QrCodeResponse = await response.json();
 
-        return Buffer.from(
-            data.data.qr_code
-                .replace(/^data:image\/png;base64,/, ''),
-            "base64"
-        );
-    } catch {
-        return null;
-    }
+    return Buffer.from(
+      data.data.qr_code
+        .replace(/^data:image\/png;base64,/, ''),
+      "base64"
+    );
+  } catch {
+    return null;
+  }
 }
 
 export {
-    topAuthor,
-    authorPosts,
-    getTags,
-    explore,
-    siteInformation,
-    lastPosts,
-    searchPosts,
-    qrCode
+  topAuthor,
+  authorPosts,
+  getTags,
+  explore,
+  siteInformation,
+  lastPosts,
+  searchPosts,
+  qrCode
 }
 /**
  * @copyright
