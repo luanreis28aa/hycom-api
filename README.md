@@ -1,179 +1,177 @@
-# discord-player
-Discord music player.
+**HyCom API**
 
+A lightweight TypeScript client for the [HyCom](https://hycom.ir) public API. This package provides convenient functions to fetch authors, posts, tags, site statistics, and QR codes, handling all network requests internally.
 
-## Introduction
+---
 
-This repository provides a fully-typed `MusicPlayer` class for Discord self-bots, along with a strongly-typed event system using an `enum`. You get:
+## Features
 
-* A single `MusicPlayer.ts` implementation that extends `EventEmitter` and emits fixed, well-typed events
-* A `src/types.ts` file defining `MusicPlayerEvent` (as an `enum`), the payload interfaces for each event, and a `TypedEmitter` interface for full type-safety
-
-You can install, import, and start listening to player events in seconds, without touching raw channel messaging.
+* Fetch top authors by views
+* Retrieve posts by author
+* List popular tags
+* Explore and search posts with pagination and sorting
+* Get site-wide statistics
+* Generate QR codes for any URL
 
 ---
 
 ## Installation
 
-```bash
-npm install --save @persian-caesar/discord-player
-```
-
-> **Note:**
-> This package provides the player and its types. You still need to install the actual playback libraries as peer dependencies:
+Install via npm or yarn:
 
 ```bash
-npm install @discordjs/voice ytdl-core-discord ytdl-core play-dl @distube/ytdl-core soundcloud-downloader ffmpeg-static @discordjs/opus libsodium-wrappers
+npm install @persian-caesar/hycom-api
+# or
+yarn add @persian-caesar/hycom-api
 ```
 
 ---
 
-## Quick Start (TypeScript)
+## Quick Start
 
 ```ts
-import { MusicPlayer, MusicPlayerEvent } from "@persian-caesar/discord-player";
-import type { VoiceChannel } from "@persian-caesar/discord-player";
+import {
+  topAuthor,
+  authorPosts,
+  getTags,
+  explore,
+  siteInformation,
+  lastPosts,
+  searchPosts,
+  qrCode
+} from '@persian-caesar/hycom-api';
 
-// Assume you already have a VoiceChannel object:
-const voiceChannel: VoiceChannel = /* your voice channel instance */;
+async function main() {
+  // 1. Get top 5 authors by view count
+  const authors = await topAuthor(5);
+  console.log('Top Authors:', authors);
 
-const player = new MusicPlayer(voiceChannel, 50, {
-  autoLeaveOnEmptyQueue: true,
-  autoLeaveOnIdleMs: 300_000,
-});
+  // 2. Retrieve latest posts by a specific author
+  const postsByAuthor = await authorPosts('john-doe', 10, 'newest');
+  console.log("John Doe's Posts:", postsByAuthor);
 
-// Listen for events
-player.on(MusicPlayerEvent.Start, ({ url, history, metadata }) => {
-  console.log(`▶️ Now playing: ${url}`);
-});
+  // 3. List 15 most popular tags
+  const tags = await getTags(15);
+  console.log('Tags:', tags);
 
-player.on(MusicPlayerEvent.QueueAdd, ({ url, queue }) => {
-  console.log(`➕ Added to queue: ${url} (queue length: ${queue.length})`);
-});
+  // 4. Explore posts: page 2, sorted by most viewed, filtered by 'javascript'
+  const exploreResults = await explore('', 2, 12, 'most_viewed', 'javascript');
+  console.log('Explore Results:', exploreResults);
 
-player.on(MusicPlayerEvent.Finish, ({ history }) => {
-  console.log("⏹️ Playback finished.");
-});
+  // 5. Fetch site information
+  const siteInfo = await siteInformation();
+  console.log('Site Information:', siteInfo);
 
-player.on(MusicPlayerEvent.Error, (error) => {
-  console.error("❌ Player error:", error.message);
-});
+  // 6. Get the 8 most recent posts
+  const recent = await lastPosts(8);
+  console.log('Recent Posts:', recent);
 
-// Start playing
-await player.play("https://youtu.be/dQw4w9WgXcQ");
+  // 7. Search posts by keyword
+  const searchResults = await searchPosts('nodejs', 10, 1);
+  console.log('Search Results:', searchResults);
+
+  // 8. Generate a QR code for a URL
+  const qrBuffer = await qrCode('https://example.com');
+  // Save the QR buffer to disk in Node.js
+  import * as fs from 'fs';
+  fs.writeFileSync('qrcode.png', qrBuffer);
+  console.log('QR code saved!');
+}
+
+main().catch(console.error);
 ```
 
----
+## Usage in JavaScript
 
+If you're using plain JavaScript (CommonJS), import and use the library like this:
 
-## Quick Start (JavaScript)
+```js
+const {
+  topAuthor,
+  authorPosts,
+  getTags,
+  explore,
+  siteInformation,
+  lastPosts,
+  searchPosts,
+  qrCode
+} = require('@persian-caesar/hycom-api');
 
-```ts
-// @persian-caesar/discord-player ships with JSDoc types, so plain JS works too:
-const { MusicPlayer, MusicPlayerEvent } = require("@persian-caesar/discord-player");
+(async () => {
+  try {
+    // Example: fetch top 3 authors
+    const authors = await topAuthor(3);
+    console.log('Top 3 Authors:', authors);
 
-/**
- * @type {import("@persian-caesar/discord-player").VoiceChannel}
- */
-const voiceChannel = /* your voice channel instance */;
+    // Fetch posts by author 'jane-doe-456'
+    const posts = await authorPosts('jane-doe-456', 5, 'most_viewed');
+    console.log("Jane Doe's Posts:", posts);
 
-const player = new MusicPlayer(voiceChannel, 50, {
-  autoLeaveOnEmptyQueue: true,
-  autoLeaveOnIdleMs: 300_000,
-});
+    // List tags
+    const tags = await getTags(10);
+    console.log('Popular Tags:', tags);
 
-player.on(MusicPlayerEvent.Start, ({ url, history, metadata }) => {
-  console.log("▶️ Now playing:", url);
-});
+    // Explore articles with pagination
+    const exploreResults = await explore('javascript', 1, 8, 'recommended', 'nodejs');
+    console.log('Explore Results:', exploreResults);
 
-player.play("https://youtu.be/dQw4w9WgXcQ");
+    // Site information
+    const info = await siteInformation();
+    console.log('Site Info:', info);
+
+    // Last posts
+    const recent = await lastPosts(6);
+    console.log('Recent Posts:', recent);
+
+    // Search posts
+    const search = await searchPosts('api', 5, 1);
+    console.log('Search Results:', search);
+
+    // Generate QR code
+    const qrBuffer = await qrCode('https://example.com');
+    const fs = require('fs');
+    fs.writeFileSync('qrcode_js.png', qrBuffer);
+    console.log('QR code saved as qrcode_js.png');
+  } catch (error) {
+    console.error('Error:', error);
+  }
+})();
 ```
 
 ---
 
 ## API Reference
 
-### `class MusicPlayer`
-
-#### Constructor
-
-```ts
-new MusicPlayer(
-  channel: VoiceChannel,
-  initialVolume?: number,        // default: 100 => 100%
-  options?: MusicPlayerOptions,  // { autoLeaveOnEmptyQueue?: boolean, autoLeaveOnIdleMs?: number }
-)
-```
-
-* `autoLeaveOnEmptyQueue` (default `true`): automatically disconnect when queue ends
-* `autoLeaveOnIdleMs` (default `5 * 60_000` ms): time before auto-disconnect on idle
-
-#### Methods
-
-| Method                       | Description                               |
-| ---------------------------- | ----------------------------------------- |
-| `play(input: string)`        | Search & play or enqueue a track          |
-| `pause()`                    | Pause playback                            |
-| `resume()`                   | Resume playback                           |
-| `setVolume(percent: number)` | Set volume (0–200%)                       |
-| `skip()`                     | Skip current track                        |
-| `previous()`                 | Go back to previous track                 |
-| `shuffle()`                  | Shuffle the queue                         |
-| `toggleLoopQueue()`          | Toggle queue repeat                       |
-| `toggleLoopTrack()`          | Toggle single-track repeat                |
-| `stop(disconnect?: boolean)` | Stop playback (and optionally disconnect) |
-| `disconnect()`               | Force disconnect immediately              |
-| `getQueue(): string[]`       | Get copy of current queue URLs            |
-| `getVolume(): number`        | Get current volume as percentage          |
+| Function                                            | Description                                                          | Parameters                                                                                                                | Returns                           |          |
+| --------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | -------- |
+| `topAuthor(limit?)`                                 | Fetches authors sorted by total views                                | `limit` (number, default `10`): number of authors to return (1–50)                                                        | `Author[]`                        |          |
+| `authorPosts(name, limit?, sort?)`                  | Retrieves published posts by a given author                          | `name` (string): display name and profile ID (e.g., "jane-doe-123")<br>`limit` (number, default `10`)<br>`sort` ("newest" | "most\_viewed", default "newest") | `Post[]` |
+| `getTags(limit?)`                                   | Returns tags with their associated post counts                       | `limit` (number, default `20`): number of tags (1–100)                                                                    | `Tag[]`                           |          |
+| `explore(search?, page?, limit?, sort?, tag?)`      | Paginated list of articles with filtering and sorting                | `search` (string)<br>`page` (number, default `1`)<br>`limit` (number, default `12`)<br>`sort` ("recommended"              |                                   |          |
+| "newest"                                            |                                                                      |                                                                                                                           |                                   |          |
+| "most\_viewed", default "newest")<br>`tag` (string) | `Post[]`                                                             |                                                                                                                           |                                   |          |
+| `siteInformation()`                                 | Site statistics including last post, total views, posts, and authors | —                                                                                                                         | `SiteInformation`                 |          |
+| `lastPosts(limit?)`                                 | Fetches the most recent published posts                              | `limit` (number, default `10`)                                                                                            | `Post[]`                          |          |
+| `searchPosts(query, limit?, page?)`                 | Searches posts by title, tags, or author                             | `query` (string): search term<br>`limit` (number, default `10`)<br>`page` (number, default `1`)                           | `Post[]`                          |          |
+| `qrCode(url)`                                       | Generates a QR code image buffer for the specified URL               | `url` (string): URL to encode                                                                                             | `Buffer`                          |          |
 
 ---
 
-### `enum MusicPlayerEvent`
+## Types
 
-```ts
-export enum MusicPlayerEvent {
-  Start = "start",
-  QueueAdd = "queueAdd",
-  Pause = "pause",
-  Resume = "resume",
-  Stop = "stop",
-  Skip = "skip",
-  Previous = "previous",
-  Shuffle = "shuffle",
-  LoopQueue = "loopQueue",
-  LoopTrack = "loopTrack",
-  VolumeChange = "volumeChange",
-  Finish = "finish",
-  Disconnect = "disconnect",
-  Error = "error",
-}
-```
+All response data types are defined in `types.ts`. Key interfaces include:
 
-Each event emits a strongly-typed payload:
-
-```ts
-// examples of payload shapes
-Start         → { url: string; history: string[]; metadata: TrackMetadata; }
-QueueAdd      → { url: string; queue: TrackMetadata[] }
-Pause/Resume  → no payload
-VolumeChange  → { volume: number }
-Skip/Previous → { history: string[] }
-Shuffle       → { queue: TrackMetadata[] }
-LoopQueue/Track → { enabled: boolean }
-Finish        → { history: string[] }
-Disconnect    → no payload
-Error         → Error instance
-```
-
-For full payload definitions, see `src/types.ts`.
+* `Author`: metadata about an author (name, profile ID, views)
+* `Post`: article information (title, summary, image, stats)
+* `Tag`: tag slug and post count
+* `SiteInformation`: overall site metrics
+* `QrCodeResponse`: raw Base64 QR code string
 
 ---
 
-## Documentation & Support
+## License
 
-* **Repository**: [https://github.com/Persian-Caesar/discord-player](https://github.com/Persian-Caesar/discord-player)
-* **Issues**: [https://github.com/Persian-Caesar/discord-player/issues](https://github.com/Persian-Caesar/discord-player/issues)
-* **License**: MIT
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
 ---
 
