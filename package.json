@@ -1,0 +1,36 @@
+{
+  "name": "@persian-caesar/hycom-api",
+  "version": "1.0.0",
+  "description": "A package for easy using hycom.ir api service.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Persian-Caesar/hycom-api.git"
+  },
+  "keywords": [
+    "hycom",
+    "nodejs",
+    "npm",
+    "typescript",
+    "Persian-Caesar",
+    "mr-sinre",
+    "Sobhan-SRZA"
+  ],
+  "author": "Persian Caesar & Sobhan-SRZA",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Persian-Caesar/hycom-api/issues"
+  },
+  "homepage": "https://github.com/Persian-Caesar/hycom-api#readme",
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21"
+  }
+}
