@@ -46,39 +46,21 @@ export interface ExploreResponse {
 }
 
 export interface SiteInformation {
-    last_post: {
-        title: string;
-        url: string;
-        created_at: string;
-    },
+    last_post: Post,
     ping: number;
+    total_tags: number;
     total_views: number;
     total_posts: number;
     total_authors: number;
 }
-export interface SiteInformationResponse {
+export interface WebSiteInformationResponse {
     success: boolean;
     data: {
-        last_post: {
-            title: string;
-            url: string;
-            created_at: string;
-        },
-        ping: string;
+        total_tags: number;
         total_views: number;
         total_posts: number;
         total_authors: number;
     }
-}
-
-export interface LastPostsResponse {
-    success: boolean;
-    data: Post[];
-}
-
-export interface SearchPostsResponse {
-    success: boolean;
-    data: Post[];
 }
 
 export interface QrCodeResponse {
