@@ -2,11 +2,9 @@ import {
   AuthorPostsResponse,
   ExploreResponse,
   ExploreSortParametr,
-  LastPostsResponse,
   QrCodeResponse,
-  SearchPostsResponse,
   SiteInformation,
-  SiteInformationResponse,
+  WebSiteInformationResponse,
   SortParametr,
   TagsResponse,
   TopAuthorResponse
@@ -30,7 +28,7 @@ import {
       "description": "Returns top authors sorted by total views"
     },
     {
-      "endpoint": "/api/author-posts/\u003Cdisplay_name\u003E/",
+      "endpoint": "/api/author-posts/{display_name}/",
       "method": "GET",
       "parameters": [
         {
@@ -110,44 +108,6 @@ import {
       "description": "Returns site statistics including last post, total views, total posts, and total authors"
     },
     {
-      "endpoint": "/api/last-posts/",
-      "method": "GET",
-      "parameters": [
-        {
-          "name": "limit",
-          "type": "integer",
-          "default": 10,
-          "description": "Number of posts to return (1-50)"
-        }
-      ],
-      "description": "Returns the most recent published posts"
-    },
-    {
-      "endpoint": "/api/search-posts/",
-      "method": "GET",
-      "parameters": [
-        {
-          "name": "q",
-          "type": "string",
-          "required": true,
-          "description": "Search query for title, tags, or author"
-        },
-        {
-          "name": "limit",
-          "type": "integer",
-          "default": 10,
-          "description": "Number of posts per page (1-50)"
-        },
-        {
-          "name": "page",
-          "type": "integer",
-          "default": 1,
-          "description": "Page number for pagination"
-        }
-      ],
-      "description": "Searches published posts by query"
-    },
-    {
       "endpoint": "/api/qr-code/",
       "method": "GET",
       "parameters": [
@@ -180,7 +140,7 @@ const hycom = {
  * 
  * @param limit Number of authors to return. (1-50)
  */
-async function topAuthor(limit: number = 10) {
+async function topAuthors(limit: number = 10) {
   try {
     const response = await fetch(hycom.url + hycom.topAuthor + `?limit=${limit}`);
     const data: TopAuthorResponse = await response.json();
@@ -248,14 +208,15 @@ async function explore(search: string = "", page: number = 1, limit: number = 12
 /**
  * Returns site statistics including last post, total views, total posts, and total authors.
  */
-async function siteInformation() {
+async function websiteInformation() {
   try {
     const now = Date.now();
     const response = await fetch(hycom.url + hycom.siteInformation);
-    const data: SiteInformationResponse = await response.json();
+    const data: WebSiteInformationResponse = await response.json();
     const siteInfo = data.data as any as SiteInformation;
 
     siteInfo.ping = Date.now() - now;
+    siteInfo.last_post = (await lastPosts(1))![0];
     return siteInfo;
   } catch {
     return null;
@@ -269,26 +230,8 @@ async function siteInformation() {
  */
 async function lastPosts(limit: number = 10) {
   try {
-    const response = await fetch(hycom.url + hycom.lastPosts + `?limit=${limit}`);
-    const data: LastPostsResponse = await response.json();
-
-    return data.data;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Searches published posts by query.
- * 
- * @param query Search query for title, tags, or author.
- * @param limit Number of posts per page. (1-50)
- * @param page Page number for pagination.
- */
-async function searchPosts(query: string, limit: number = 10, page: number = 1) {
-  try {
-    const response = await fetch(hycom.url + hycom.searchPosts + `?q=${query}&limit=${limit}&page=${page}`);
-    const data: SearchPostsResponse = await response.json();
+    const response = await fetch(hycom.url + hycom.explore + `?page=1&limit=${limit}&sort=newest`);
+    const data: ExploreResponse = await response.json();
 
     return data.data;
   } catch {
@@ -317,13 +260,12 @@ async function qrCode(url: string) {
 }
 
 export {
-  topAuthor,
+  topAuthors,
   authorPosts,
   getTags,
   explore,
-  siteInformation,
+  websiteInformation,
   lastPosts,
-  searchPosts,
   qrCode
 }
 /**

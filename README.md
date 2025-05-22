@@ -31,23 +31,22 @@ yarn add @persian-caesar/hycom-api
 
 ```ts
 import {
-  topAuthor,
+  topAuthors,
   authorPosts,
   getTags,
   explore,
-  siteInformation,
+  websiteInformation,
   lastPosts,
-  searchPosts,
   qrCode
 } from '@persian-caesar/hycom-api';
 
 async function main() {
   // 1. Get top 5 authors by view count
-  const authors = await topAuthor(5);
+  const authors = await topAuthors(5);
   console.log('Top Authors:', authors);
 
   // 2. Retrieve latest posts by a specific author
-  const postsByAuthor = await authorPosts('john-doe', 10, 'newest');
+  const postsByAuthor = await authorPosts('SobhanSRZA-1637', 10, 'newest');
   console.log("John Doe's Posts:", postsByAuthor);
 
   // 3. List 15 most popular tags
@@ -59,18 +58,14 @@ async function main() {
   console.log('Explore Results:', exploreResults);
 
   // 5. Fetch site information
-  const siteInfo = await siteInformation();
+  const siteInfo = await websiteInformation();
   console.log('Site Information:', siteInfo);
 
   // 6. Get the 8 most recent posts
   const recent = await lastPosts(8);
   console.log('Recent Posts:', recent);
 
-  // 7. Search posts by keyword
-  const searchResults = await searchPosts('nodejs', 10, 1);
-  console.log('Search Results:', searchResults);
-
-  // 8. Generate a QR code for a URL
+  // 7. Generate a QR code for a URL
   const qrBuffer = await qrCode('https://example.com');
   // Save the QR buffer to disk in Node.js
   import * as fs from 'fs';
@@ -87,20 +82,19 @@ If you're using plain JavaScript (CommonJS), import and use the library like thi
 
 ```js
 const {
-  topAuthor,
+  topAuthors,
   authorPosts,
   getTags,
   explore,
-  siteInformation,
+  websiteInformation,
   lastPosts,
-  searchPosts,
   qrCode
 } = require('@persian-caesar/hycom-api');
 
 (async () => {
   try {
     // Example: fetch top 3 authors
-    const authors = await topAuthor(3);
+    const authors = await topAuthors(3);
     console.log('Top 3 Authors:', authors);
 
     // Fetch posts by author 'jane-doe-456'
@@ -116,16 +110,12 @@ const {
     console.log('Explore Results:', exploreResults);
 
     // Site information
-    const info = await siteInformation();
+    const info = await websiteInformation();
     console.log('Site Info:', info);
 
     // Last posts
     const recent = await lastPosts(6);
     console.log('Recent Posts:', recent);
-
-    // Search posts
-    const search = await searchPosts('api', 5, 1);
-    console.log('Search Results:', search);
 
     // Generate QR code
     const qrBuffer = await qrCode('https://example.com');
@@ -144,15 +134,14 @@ const {
 
 | Function                                            | Description                                                          | Parameters                                                                                                                | Returns                           |          |
 | --------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | -------- |
-| `topAuthor(limit?)`                                 | Fetches authors sorted by total views                                | `limit` (number, default `10`): number of authors to return (1–50)                                                        | `Author[]`                        |          |
+| `topAuthors(limit?)`                                 | Fetches authors sorted by total views                                | `limit` (number, default `10`): number of authors to return (1–50)                                                        | `Author[]`                        |          |
 | `authorPosts(name, limit?, sort?)`                  | Retrieves published posts by a given author                          | `name` (string): display name and profile ID (e.g., "jane-doe-123")<br>`limit` (number, default `10`)<br>`sort` ("newest" | "most\_viewed", default "newest") | `Post[]` |
 | `getTags(limit?)`                                   | Returns tags with their associated post counts                       | `limit` (number, default `20`): number of tags (1–100)                                                                    | `Tag[]`                           |          |
 | `explore(search?, page?, limit?, sort?, tag?)`      | Paginated list of articles with filtering and sorting                | `search` (string)<br>`page` (number, default `1`)<br>`limit` (number, default `12`)<br>`sort` ("recommended"              |                                   |          |
 | "newest"                                            |                                                                      |                                                                                                                           |                                   |          |
 | "most\_viewed", default "newest")<br>`tag` (string) | `Post[]`                                                             |                                                                                                                           |                                   |          |
-| `siteInformation()`                                 | Site statistics including last post, total views, posts, and authors | —                                                                                                                         | `SiteInformation`                 |          |
+| `websiteInformation()`                                 | Site statistics including last post, total views, posts, and authors | —                                                                                                                         | `SiteInformation`                 |          |
 | `lastPosts(limit?)`                                 | Fetches the most recent published posts                              | `limit` (number, default `10`)                                                                                            | `Post[]`                          |          |
-| `searchPosts(query, limit?, page?)`                 | Searches posts by title, tags, or author                             | `query` (string): search term<br>`limit` (number, default `10`)<br>`page` (number, default `1`)                           | `Post[]`                          |          |
 | `qrCode(url)`                                       | Generates a QR code image buffer for the specified URL               | `url` (string): URL to encode                                                                                             | `Buffer`                          |          |
 
 ---
@@ -164,7 +153,7 @@ All response data types are defined in `types.ts`. Key interfaces include:
 * `Author`: metadata about an author (name, profile ID, views)
 * `Post`: article information (title, summary, image, stats)
 * `Tag`: tag slug and post count
-* `SiteInformation`: overall site metrics
+* `WebSiteInformation`: overall site metrics
 * `QrCodeResponse`: raw Base64 QR code string
 
 ---
